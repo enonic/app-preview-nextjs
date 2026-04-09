@@ -1,0 +1,41 @@
+plugins {
+    id 'com.enonic.xp.app'
+}
+
+app {
+}
+
+dependencies {
+    implementation xplibs.api.core
+    implementation xplibs.api.portal
+    implementation xplibs.api.script
+
+    include xplibs.content
+    include xplibs.portal
+    include xplibs.context
+    include xplibs.i18n
+
+    implementation libs.guava.guava
+    include libs.apache.commons.text
+    include libs.lib.http.client
+    include libs.lib.cache
+
+    testImplementation platform( libs.junit.bom )
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.launcher
+
+    testImplementation platform( libs.mockito.bom )
+    testImplementation libs.mockito.core
+    testImplementation libs.mockito.jupiter
+    testImplementation libs.assertj.core
+}
+
+test {
+    useJUnitPlatform()
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    xp.enonicRepo( 'dev' )
+}
