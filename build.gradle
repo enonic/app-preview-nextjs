@@ -14,6 +14,10 @@ dependencies {
     include xplibs.portal
     include xplibs.context
     include xplibs.i18n
+    include xplibs.event
+    include xplibs.node
+    include xplibs.project
+    include xplibs.cluster
 
     implementation libs.guava.guava
     include libs.apache.commons.text
