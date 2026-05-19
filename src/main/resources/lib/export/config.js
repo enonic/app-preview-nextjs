@@ -33,8 +33,8 @@ function getServerConfig(site) {
     var config = configs[configName] || configs['default'];
     if (!config) {
         config = {
-            url: 'http://127.0.0.1:3000',
-            secret: ''
+            url: 'http://localhost:3000',
+            secret: 'mySecretKey'
         };
     }
     return config;

@@ -13,26 +13,30 @@ function fetchMappings(serverUrl, encryptedPayload) {
     if (encryptedPayload) {
         url += '?xp=' + encryptedPayload;
     }
+    let mappings;
+    try {
+        const response = httpClient.request({
+            url: url,
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            },
+            connectionTimeout: 5000,
+            readTimeout: 10000
+        });
 
-    const response = httpClient.request({
-        url: url,
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json'
-        },
-        connectionTimeout: 5000,
-        readTimeout: 10000
-    });
+        if (response.status === 200) {
+            const body = response.body;
+            mappings = JSON.parse(body).mappings;
+            log.debug(`Fetched mappings from "${url}":\n${JSON.stringify(body, null, 2)}`);
+        } else {
+            log.error(`Error fetching mappings from "${url}": [${response.status}] ${response.statusText}`);
+        }
 
-    if (response.status !== 200) {
-        throw new Error(`Failed to fetch mappings from "${url}": HTTP ${response.status}`);
+    } catch (e) {
+        log.error(`Error fetching mappings from "${url}": ${e}`);
     }
-
-    const body = JSON.parse(response.body);
-
-    log.debug(`Fetched mappings from "${url}":\n${JSON.stringify(body, null, 2)}`);
-
-    return body.mappings || [];
+    return mappings || [];
 }
 
 function getMappings(serverUrl, encryptedPayload) {
