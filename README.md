@@ -27,7 +27,7 @@ nextjs.production.secret=prodSecret
 
 When multiple configurations are defined, each site can select which one to use via the site configuration form. If omitted, the `default` configuration is used.
 
-NOTE: If no configuration is provided, the app defaults to `url=http://127.0.0.1:3000` with an empty secret (no encryption).
+NOTE: If no configuration is provided, the app defaults to `url=http://127.0.0.1:3000` with `mySecretKey` secret.
 
 
 ### Next.js side
@@ -52,11 +52,11 @@ The Next.js server must expose a `GET /api/mappings` endpoint that returns URL m
 
 #### Mapping fields
 
-| Field | Description |
-|---|---|
-| `sources` | Array of source patterns — content field constraints or path regex (see below) |
-| `target` | URL path template with `${field}` variable substitution |
-| `matchAny` | `true` to match if any source matches, `false` (default) to require all |
+| Field      | Description                                                                    |
+|------------|--------------------------------------------------------------------------------|
+| `sources`  | Array of source patterns — content field constraints or path regex (see below) |
+| `target`   | URL path template with `${field}` variable substitution                        |
+| `matchAny` | `true` to require any source match, `false` (default) to require all           |
 
 #### Source patterns
 
@@ -64,6 +64,9 @@ Sources can be content field constraints or path regex patterns, mixed in a sing
 
 - **Content constraints:** `type:app:article`, `data.category:foo`, `_path:'/features/.*'`
 - **Path regex:** `/articles/.*`, `/products/.*`
+
+TIP: Learn more about [content field constraints](https://developer.enonic.com/docs/code/stable/web/sites/mappings#match_mappings)
+and [path regex](https://developer.enonic.com/docs/code/stable/web/sites/mappings#pattern_mappings) in the Enonic XP docs.
 
 #### Target template variables
 
@@ -76,7 +79,7 @@ Sources can be content field constraints or path regex patterns, mixed in a sing
 
 1. Content Studio calls the preview widget with content details
 2. The widget reads `url` + `secret` for the site's configured Next.js server
-3. URL mappings are fetched from `<url>/api/mappings` (cached for 24 hours)
+3. URL mappings are fetched from `<url>/api/mappings` (cached for 24 hours, stop/start the app to clear it)
 4. Content is matched against mapping rules to resolve the target URL
 5. `{xpProject}` is encrypted with AES-256-GCM using the shared secret
 6. The resolved URL is returned with `?xp=<encrypted-blob>` appended
