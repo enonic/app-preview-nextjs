@@ -36,6 +36,8 @@ Two-layer design: **Java** for crypto and content-to-URL resolution, **JavaScrip
 - `UrlMapping` — mapping rule: sources (match patterns) + target (URL template with `${field}` placeholders)
 - `ContentFieldAccessor` — implements `StringLookup` for Apache Commons `StringSubstitutor`; resolves content fields (`_id`, `_name`, `_path`, `type`, `data.*`, `x.*`) and evaluates constraint expressions
 - `MatchStrategy` — `ANY` (first match wins) vs `ALL` (all must match)
+- `PreviewCspProcessor` — `AdminExtensionResponseProcessor` (OSGi component, requires XP ≥ 8.1) adding configured Next.js origins to the
+  Content Studio tool page's `frame-src`/`connect-src` CSP so the preview iframe can render them
 
 ### JavaScript Layer (`src/main/resources/`)
 

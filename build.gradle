@@ -9,6 +9,8 @@ dependencies {
     implementation xplibs.api.core
     implementation xplibs.api.portal
     implementation xplibs.api.script
+    implementation xplibs.api.admin
+    implementation xplibs.api.web
 
     include xplibs.content
     include xplibs.portal
