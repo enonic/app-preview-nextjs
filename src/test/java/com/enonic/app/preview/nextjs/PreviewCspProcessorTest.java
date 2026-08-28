@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.enonic.xp.portal.PortalRequest;
 import com.enonic.xp.portal.PortalResponse;
+import com.enonic.xp.server.RunMode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -24,7 +25,7 @@ public class PreviewCspProcessorTest
     @BeforeEach
     void setUp()
     {
-        processor = new PreviewCspProcessor();
+        processor = new PreviewCspProcessor( RunMode.DEV );
         request = new PortalRequest();
         response = PortalResponse.create().build();
     }
@@ -72,7 +73,7 @@ public class PreviewCspProcessorTest
     }
 
     @Test
-    public void testFallsBackToLocalhostWhenNothingConfigured()
+    public void testDevFallsBackToLocalhostWhenNothingConfigured()
     {
         processor.activate( Map.of() );
 
@@ -80,6 +81,40 @@ public class PreviewCspProcessorTest
 
         assertEquals( List.of( "http://localhost:3000" ), directive( "frame-src" ) );
         assertEquals( List.of( "http://localhost:3000" ), directive( "connect-src" ) );
+    }
+
+    @Test
+    public void testProdContributesNothingWhenNothingConfigured()
+    {
+        processor = new PreviewCspProcessor( RunMode.PROD );
+        processor.activate( Map.of() );
+
+        processor.process( request, response );
+
+        assertEquals( "", request.getContentSecurityPolicy().serialize() );
+    }
+
+    @Test
+    public void testProdContributesNothingWhenOnlyInvalidUrlsConfigured()
+    {
+        processor = new PreviewCspProcessor( RunMode.PROD );
+        processor.activate( Map.of( "nextjs.default.url", "not a url" ) );
+
+        processor.process( request, response );
+
+        assertEquals( "", request.getContentSecurityPolicy().serialize() );
+    }
+
+    @Test
+    public void testProdUsesExplicitConfigurations()
+    {
+        processor = new PreviewCspProcessor( RunMode.PROD );
+        processor.activate( Map.of( "nextjs.default.url", "https://site.example.com" ) );
+
+        processor.process( request, response );
+
+        assertEquals( List.of( "https://site.example.com" ), directive( "frame-src" ) );
+        assertEquals( List.of( "https://site.example.com" ), directive( "connect-src" ) );
     }
 
     @Test

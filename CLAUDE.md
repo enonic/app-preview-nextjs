@@ -37,7 +37,8 @@ Two-layer design: **Java** for crypto and content-to-URL resolution, **JavaScrip
 - `ContentFieldAccessor` — implements `StringLookup` for Apache Commons `StringSubstitutor`; resolves content fields (`_id`, `_name`, `_path`, `type`, `data.*`, `x.*`) and evaluates constraint expressions
 - `MatchStrategy` — `ANY` (first match wins) vs `ALL` (all must match)
 - `PreviewCspProcessor` — `AdminExtensionResponseProcessor` (OSGi component, requires XP ≥ 8.1) adding configured Next.js origins to the
-  Content Studio tool page's `frame-src`/`connect-src` CSP so the preview iframe can render them
+  Content Studio tool page's `frame-src`/`connect-src` CSP so the preview iframe can render them; falls back to `http://localhost:3000`
+  only when XP runs in dev mode — in prod, unconfigured means no CSP contribution
 
 ### JavaScript Layer (`src/main/resources/`)
 

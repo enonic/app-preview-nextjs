@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.enonic.xp.admin.extension.AdminExtensionResponseProcessor;
 import com.enonic.xp.portal.PortalRequest;
 import com.enonic.xp.portal.PortalResponse;
+import com.enonic.xp.server.RunMode;
 
 @Component(immediate = true, configurationPid = "com.enonic.app.preview.nextjs",
     property = "key=com.enonic.app.preview.nextjs:preview-next")
@@ -29,7 +30,19 @@ public class PreviewCspProcessor
 
     private static final String FALLBACK_URL = "http://localhost:3000";
 
+    private final RunMode runMode;
+
     private volatile List<String> origins = List.of();
+
+    public PreviewCspProcessor()
+    {
+        this( RunMode.get() );
+    }
+
+    PreviewCspProcessor( final RunMode runMode )
+    {
+        this.runMode = runMode;
+    }
 
     @Activate
     @Modified
@@ -51,7 +64,7 @@ public class PreviewCspProcessor
             }
         } );
 
-        if ( result.isEmpty() )
+        if ( result.isEmpty() && this.runMode == RunMode.DEV )
         {
             result.add( toOrigin( FALLBACK_URL ) );
         }
@@ -62,8 +75,11 @@ public class PreviewCspProcessor
     @Override
     public PortalResponse process( final PortalRequest request, final PortalResponse response )
     {
-        final String[] sources = this.origins.toArray( String[]::new );
-        request.getContentSecurityPolicy().frameSrc( sources ).connectSrc( sources );
+        if ( !this.origins.isEmpty() )
+        {
+            final String[] sources = this.origins.toArray( String[]::new );
+            request.getContentSecurityPolicy().frameSrc( sources ).connectSrc( sources );
+        }
         return response;
     }
 
