@@ -1,5 +1,6 @@
 package com.enonic.app.preview.nextjs;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -13,11 +14,14 @@ import com.enonic.xp.content.Mixins;
 import com.enonic.xp.data.Property;
 import com.enonic.xp.data.PropertyTree;
 import com.enonic.xp.schema.mixin.MixinName;
+import com.enonic.xp.site.Site;
 
 public class ContentFieldAccessor
     implements StringLookup
 {
     private final Content content;
+
+    private final Map<String, String> customFields = new HashMap<>();
 
     private static final String ID_PROPERTY = "_id";
 
@@ -40,6 +44,27 @@ public class ContentFieldAccessor
     public ContentFieldAccessor( final Content content )
     {
         this.content = content;
+    }
+
+    public ContentFieldAccessor addField( final String key, final String value )
+    {
+        customFields.put( key, value );
+        return this;
+    }
+
+    public static String getSiteRelativePath( final String path, final Content content, final Site site )
+    {
+        if ( content.isSite() )
+        {
+            return "/";
+        }
+
+        if ( site == null )
+        {
+            return path;
+        }
+
+        return path.substring( site.getPath().toString().length() );
     }
 
     public boolean matches( final String condition )
@@ -104,6 +129,12 @@ public class ContentFieldAccessor
         if ( content == null )
         {
             return null;
+        }
+
+        final String custom = customFields.get( key );
+        if ( custom != null )
+        {
+            return custom;
         }
 
         if ( ID_PROPERTY.equals( key ) )

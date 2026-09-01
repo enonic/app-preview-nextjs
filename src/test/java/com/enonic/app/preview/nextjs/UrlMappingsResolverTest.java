@@ -221,6 +221,37 @@ public class UrlMappingsResolverTest
         assertNull( result );
     }
 
+    @Test
+    public void testSiteRelativePathTemplateField()
+    {
+        Map<String, String> result = resolver.resolve( createParams(), createMappings( "default" ) );
+
+        assertNotNull( result );
+        assertEquals( "http://localhost:8080/rel/content", result.get( "url" ) );
+    }
+
+    @Test
+    public void testSiteRelativePathForSiteItself()
+    {
+        when( contentService.getById( ContentId.from( "content-id" ) ) ).thenReturn( site );
+
+        Map<String, String> result = resolver.resolve( createParams( "content-id", "/site" ), createMappings( "default" ) );
+
+        assertNotNull( result );
+        assertEquals( "http://localhost:8080/rel/", result.get( "url" ) );
+    }
+
+    @Test
+    public void testSiteRelativePathWithoutSite()
+    {
+        when( contentService.getNearestSite( ContentId.from( "content-id" ) ) ).thenReturn( null );
+
+        Map<String, String> result = resolver.resolve( createParams( "content-id", "/content" ), createMappings( "default" ) );
+
+        assertNotNull( result );
+        assertEquals( "http://localhost:8080/rel/site/content", result.get( "url" ) );
+    }
+
     private Map<String, Object> createParams()
     {
         return createParams( "content-id", "/site/content" );
@@ -303,7 +334,16 @@ public class UrlMappingsResolverTest
             UrlMapping.BASE_URL_KEY, baseUrl
         ) );
 
-        when( list.getArray() ).thenReturn( List.of( set2, set3, set1, set4 ) );
+        ScriptValue set5 = mock( ScriptValue.class );
+        when( set5.isObject() ).thenReturn( true );
+        when( set5.getMap() ).thenReturn( Map.of(
+            UrlMapping.SOURCES_KEY, Arrays.asList( "/content", "/" ),
+            UrlMapping.TARGET_KEY, "/rel${siteRelativePath}",
+            UrlMapping.BASE_URL_KEY, baseUrl,
+            UrlMapping.MATCH_ANY_KEY, true
+        ) );
+
+        when( list.getArray() ).thenReturn( List.of( set2, set3, set1, set4, set5 ) );
 
         return result;
     }

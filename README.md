@@ -71,6 +71,7 @@ and [path regex](https://developer.enonic.com/docs/code/stable/web/sites/mapping
 #### Target template variables
 
 - `${_id}`, `${_name}`, `${_path}` — Content identifiers
+- `${siteRelativePath}` — Content path relative to the nearest site (`/` for the site itself, full `_path` outside a site)
 - `${type}`, `${displayName}`, `${language}` — Content metadata
 - `${data.<field>}` — Content data fields (supports nested paths like `${data.product.category}`)
 - `${x.<app>.<mixin>.<field>}` — Extra data (x-data/mixin) fields

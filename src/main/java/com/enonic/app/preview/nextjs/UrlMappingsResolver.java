@@ -135,8 +135,10 @@ final class MappingResolverCallable
         final Site nearestSite = content.isSite() ? (Site) content : this.contentService.getNearestSite( content.getId() );
 
         final String path = params.get( "path" ).toString();
-        final String siteRelativePath = getSiteRelativePath( path, content, nearestSite );
-        final ContentFieldAccessor contentAccessor = new ContentFieldAccessor( content );
+        final String siteRelativePath = ContentFieldAccessor.getSiteRelativePath( path, content, nearestSite );
+        final ContentFieldAccessor contentAccessor = new ContentFieldAccessor( content )
+            .addField( "siteRelativePath",
+                       ContentFieldAccessor.getSiteRelativePath( content.getPath().toString(), content, nearestSite ) );
 
         for ( final UrlMapping mapping : getMappingList( nearestSite, mappingsMap ) )
         {
@@ -186,21 +188,6 @@ final class MappingResolverCallable
             LOGGER.debug( "Found {} mapping(s) with \"default\" config name", mappingList.size() );
         }
         return mappingList;
-    }
-
-    private String getSiteRelativePath( final String url, final Content content, final Site nearestSite )
-    {
-        if ( content.isSite() )
-        {
-            return "/";
-        }
-
-        if ( nearestSite == null )
-        {
-            return url;
-        }
-
-        return url.substring( nearestSite.getPath().toString().length() );
     }
 
     private SiteConfig getSiteOrProjectAppConfig( final Site nearestSite )
